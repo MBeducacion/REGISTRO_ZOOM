@@ -77,9 +77,9 @@ with st.form("registro_publico", clear_on_submit=True):
     email = st.text_input("Correo Electrónico")
     
     st.markdown("---")
-    st.write("🔒 **Política de Tratamiento de Datos**")
+    st.write("🔒 **Autorización de Tratamiento de Datos**")
     # --- MÉTODO 2: VENTANA DESPLEGABLE ---
-    with st.expander("Leer Política completa de Tratamiento de Datos (Habeas Data)"):
+    with st.expander("Leer Autotización de Tratamiento de Datos Personales"):
         st.markdown("""
         ### MB EDUCACIÓN - AUTORIZACIÓN PARA EL TRATAMIENTO DE DATOS PERSONALES
         
