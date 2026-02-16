@@ -17,7 +17,7 @@ if registro_previo == "true":
     st.success("✨ ¡Bienvenido de nuevo! Ya te encuentras registrado en este curso.")
     st.info("Haz clic en el botón de abajo para ingresar directamente a la sala de Zoom.")
     
-    link_zoom = "https://us04web.zoom.us/j/75494309875?pwd=OOGKbP8tHZrZa6rKjoxYbDsP11FSPg.1"
+    link_zoom = "https://us06web.zoom.us/j/83795391348?pwd=blBqaiYliv3OamaJJGv0SPBYMcoNVa.1"
     
     # Usamos un link real estilizado como botón para evitar bloqueos del navegador
     st.markdown(f"""
@@ -59,6 +59,19 @@ st.subheader("Bienvenido al Curso Reforma Laboral de MB Educación")
 
 with st.form("registro_publico", clear_on_submit=True):
     nombre = st.text_input("Nombre Completo *")
+    # --- NUEVA SECCIÓN: TIPO Y NÚMERO DE DOCUMENTO ---
+    col1, col2 = st.columns([1, 2]) # Dividimos en dos columnas para que se vea mejor
+    
+    with col1:
+        tipo_doc = st.selectbox(
+            "Tipo de Documento *",
+            ["C.C.", "NIT", "C.E.", "Pasaporte", "T.I.", "Otro"],
+            index=0 # Por defecto selecciona C.C.
+        )
+        
+    with col2:
+        doc_identidad = st.text_input("Número de Documento *")
+
     institucion = st.text_input("Institución Educativa /Empresa /Asociacion *")
     rol_cargo = st.text_input(" Cargo en la Institución Educativa /Empresa /Asociacion*")
     email = st.text_input("Correo Electrónico")
@@ -80,7 +93,8 @@ with st.form("registro_publico", clear_on_submit=True):
         """)
 
     st.caption("Al marcar la casilla, autoriza a MB Educación a utilizar sus datos según los términos expuestos anteriormente.")
-    acepta = st.checkbox("He leído y acepto el tratamiento de mis datos personales")
+    acepta = st.checkbox("He leído y autorizo el tratamiento de mis datos personales")
+    acepta_promos = st.checkbox("Acepto que MB Educación me envíe información de sus servicios o productos (Cursos y promociones)")    
     
     boton_registro = st.form_submit_button("REGISTRARME E INGRESAR A ZOOM")
 
@@ -91,15 +105,18 @@ if boton_registro:
             with engine.begin() as conn:
                 query = text("""
                     INSERT INTO directorio_tratamiento 
-                    (contacto_nombre, institucion, rol_cargo, email, habeas_data, canal_autorizacion) 
-                    VALUES (:nom, :inst, :rol, :mail, :hab, :cnal)
+                    (contacto_nombre, tipo_documento, documento_identidad, institucion, rol_cargo, email, habeas_data, autoriza_env_info, canal_autorizacion) 
+                    VALUES (:nom, :tdoc, :doc, :inst, :rol, :mail, :hab, :env_info, :cnal)
                 """)
                 conn.execute(query, {
                     "nom": nombre, 
+                    "tdoc": tipo_doc,    # <--- Guardamos el tipo (C.C., C.E., etc.)
+                    "doc": doc_identidad,                    
                     "inst": institucion, 
                     "mail": email,
                     "rol": rol_cargo,
-                    "hab": 1 if acepta else 0,
+                    "hab": 1,
+                    "env_info": 1 if acepta_promos else 0,
                     "cnal": "Registro Zoom, Curso Reforma Tributria" + time.strftime("%d/%m/%Y"),
                     
                 })
@@ -114,14 +131,16 @@ if boton_registro:
             time.sleep(2)
             
             # Redirección final
-            link_zoom = "https://us04web.zoom.us/j/75494309875?pwd=OOGKbP8tHZrZa6rKjoxYbDsP11FSPg.1"
+            link_zoom = "https://us06web.zoom.us/j/83795391348?pwd=blBqaiYliv3OamaJJGv0SPBYMcoNVa.1"
             st.markdown(f'<meta http-equiv="refresh" content="0; url={link_zoom}">', unsafe_allow_html=True)
                         
         except Exception as e:
             st.error(f"Error técnico: {e}")
     else:
-
-        st.warning("Por favor completa los campos obligatorios (*)")
+        if not acepta:
+            st.warning("Debe aceptar los términos y condiciones para continuar.")
+        else:
+            st.warning("Por favor completa los campos obligatorios (*)")
 
 
 
