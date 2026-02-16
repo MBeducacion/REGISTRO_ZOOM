@@ -14,7 +14,7 @@ from streamlit_javascript import st_javascript
 registro_previo = st_javascript("localStorage.getItem('mbeducacion_registro');")
 
 if registro_previo == "true":
-    st.success("✨ ¡Bienvenido de nuevo! Ya te encuentras registrado en este curso.")
+    st.success("✨ ¡Bienvenido de nuevo! Ya te encuentras registrado en el Curso Sincronico Reforma Raboral para Instituciones Educativas Privadas .")
     st.info("Haz clic en el botón de abajo para ingresar directamente a la sala de Zoom.")
     
     link_zoom = "https://us06web.zoom.us/j/83795391348?pwd=blBqaiYliv3OamaJJGv0SPBYMcoNVa.1"
@@ -55,7 +55,7 @@ engine = create_engine(
 # from tu_archivo_principal import engine 
 
 st.title("Registro de Asistencia y Tratamiento de Datos")
-st.subheader("Bienvenido al Curso Reforma Laboral de MB Educación")
+st.subheader("Bienvenido al Curso Sincronico Reforma Raboral para Instituciones Educativas Privadas MB Educación")
 
 with st.form("registro_publico", clear_on_submit=True):
     nombre = st.text_input("Nombre Completo *")
@@ -89,7 +89,6 @@ with st.form("registro_publico", clear_on_submit=True):
         c) Se que los siguientes son los derechos básicos que tengo como titular de los datos que se han diligenciado en este Formulario: 1) Todos los datos registrados en este Formulario sólo serán empleados por MB Educación para cumplir la finalidad expuesta en el punto (a) del presente Aviso; 2) En cualquier momento, puedo solicitar una consulta de la información con que MB Educación cuenta sobre mí, dirigiéndome al Oficial de Protección de Datos Personales de la Entidad; 3) MB Educación velará por la confidencialidad y privacidad de los datos personales de los titulares que están siendo reportados, según las disposiciones legales vigentes; 4) En cualquier momento puedo solicitar una prueba de esta autorización.
         d) El Oficial de Protección de Datos Personales de la Entidad, ante quien puedo ejercer mis derechos, de forma gratuita, lo contactar en la siguiente dirección electrónica: usodedatos@mbeducacion.com.co 
 
-        Acepto que MB Educación me envíe información de sus servicios o productos 
         """)
 
     st.caption("Al marcar la casilla, autoriza a MB Educación a utilizar sus datos según los términos expuestos anteriormente.")
@@ -100,7 +99,16 @@ with st.form("registro_publico", clear_on_submit=True):
 
 # --- LÓGICA DE VALIDACIÓN ---
 if boton_registro:
-    if nombre and institucion:
+    # 1. Verificación estricta de campos obligatorios y casillas
+    errores = []
+    if not nombre: errores.append("Nombre Completo")
+    if not doc_identidad: errores.append("Número de Documento")
+    if not institucion: errores.append("Institución")
+    if not email: errores.append("Correo Electrónico")
+    if not acepta: errores.append("Aceptación de Tratamiento de Datos (Casilla obligatoria)")
+
+    if not errores:
+        # SI TODO ESTÁ BIEN, PROCEDEMOS AL GUARDADO
         try:
             with engine.begin() as conn:
                 query = text("""
@@ -121,26 +129,31 @@ if boton_registro:
                     
                 })
 
-           # --- DENTRO DEL BLOQUE EXITOSO ---
+           # SOLO SI EL GUARDADO ES EXITOSO, SE EJECUTA LA REDIRECCIÓN
             st.success("¡Registro exitoso! Guardando preferencia...")
             
-            # Guardamos la marca en el navegador permanentemente
+            # Guardamos la marca en el navegador
             st_javascript("localStorage.setItem('mbeducacion_registro', 'true');")
             
             st.balloons()
-            time.sleep(2)
             
-            # Redirección final
-            link_zoom = "https://us06web.zoom.us/j/83795391348?pwd=blBqaiYliv3OamaJJGv0SPBYMcoNVa.1"
+            # Link de Zoom
+            link_zoom = "https://us04web.zoom.us/j/75494309875?pwd=OOGKbP8tHZrZa6rKjoxYbDsP11FSPg.1"
+            
+            # Redirección con un mensaje claro
+            st.info("Redirigiendo a Zoom en 2 segundos... Si no carga, haz clic en el botón de arriba.")
+            time.sleep(2)
             st.markdown(f'<meta http-equiv="refresh" content="0; url={link_zoom}">', unsafe_allow_html=True)
                         
         except Exception as e:
-            st.error(f"Error técnico: {e}")
+            st.error(f"Error técnico al guardar: {e}")
     else:
-        if not acepta:
-            st.warning("Debe aceptar los términos y condiciones para continuar.")
-        else:
-            st.warning("Por favor completa los campos obligatorios (*)")
+        # SI HAY ERRORES, MOSTRAMOS ADVERTENCIA Y NO REDIRIGIMOS
+        st.error("### ⚠️ No se puede ingresar")
+        st.write("Debes completar los siguientes puntos obligatorios:")
+        for error in errores:
+            st.write(f"- {error}")
+        st.warning("Por favor, marca la casilla de aceptación y completa tus datos para poder acceder a la reunión.")
 
 
 
