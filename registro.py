@@ -14,10 +14,10 @@ from streamlit_javascript import st_javascript
 registro_previo = st_javascript("localStorage.getItem('mbeducacion_registro');")
 
 if registro_previo == "true":
-    st.success("✨ ¡Bienvenido de nuevo! Ya te encuentras registrado en el Curso Sincronico Reforma Raboral para Instituciones Educativas Privadas .")
+    st.success("✨ ¡Bienvenido de nuevo! Ya te encuentras registrado al Webinar - Debido Proceso .")
     st.info("Haz clic en el botón de abajo para ingresar directamente a la sala de Zoom.")
     
-    link_zoom = "https://us06web.zoom.us/j/83795391348?pwd=blBqaiYliv3OamaJJGv0SPBYMcoNVa.1"
+    link_zoom = "https://us06web.zoom.us/j/89038853644?pwd=nF7qRs4SrzdyxhMB2JgCShyxgkhBIw.1"
     
     # Usamos un link real estilizado como botón para evitar bloqueos del navegador
     st.markdown(f"""
@@ -55,7 +55,7 @@ engine = create_engine(
 # from tu_archivo_principal import engine 
 
 st.title("Registro de Asistencia y Tratamiento de Datos")
-st.subheader("Bienvenido al Curso Sincronico Reforma Raboral para Instituciones Educativas Privadas MB Educación")
+st.subheader("Bienvenido al Webinar - Debido Proceso, MB Educación")
 
 with st.form("registro_publico", clear_on_submit=True):
     nombre = st.text_input("Nombre Completo *")
@@ -138,7 +138,7 @@ if boton_registro:
             st.balloons()
             
             # Link de Zoom
-            link_zoom = "https://us04web.zoom.us/j/75494309875?pwd=OOGKbP8tHZrZa6rKjoxYbDsP11FSPg.1"
+            link_zoom = "https://us06web.zoom.us/j/89038853644?pwd=nF7qRs4SrzdyxhMB2JgCShyxgkhBIw.1"
             
             # Redirección con un mensaje claro
             st.info("Redirigiendo a Zoom en 2 segundos... Si no carga, haz clic en el botón de arriba.")
