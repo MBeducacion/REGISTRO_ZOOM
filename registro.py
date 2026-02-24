@@ -6,12 +6,17 @@ from sqlalchemy import create_engine
 from sqlalchemy import create_engine, text
 import pandas as pd
 
+# --- CONFIGURACIÓN DE LA REUNIÓN ACTUAL ---
+ID_REUNION = "webinar_marzo_2026"  # <--- CAMBIA ESTO PARA CADA EVENTO NUEVO
+LINK_ZOOM_ACTUAL = "https://us06web.zoom.us/j/89038853644?pwd=nF7qRs4SrzdyxhMB2JgCShyxgkhBIw.1"
+NOMBRE_EVENTO = "Webinar - Debido Proceso 2026"
+
 # --- Al inicio, después de los imports ---
 from streamlit_javascript import st_javascript
 
 # Intentamos leer una marca en el almacenamiento local del navegador (LocalStorage)
 # Esto sobrevive aunque cierren la pestaña o apaguen el PC
-registro_previo = st_javascript("localStorage.getItem('mbeducacion_registro');")
+registro_previo = st_javascript(f"localStorage.getItem('mbeducacion_registro_{ID_REUNION}');")
 
 if registro_previo == "true":
     st.success("✨ ¡Bienvenido de nuevo! Ya te encuentras registrado al Webinar - Debido Proceso .")
@@ -133,7 +138,7 @@ if boton_registro:
             st.success("¡Registro exitoso! Guardando preferencia...")
             
             # Guardamos la marca en el navegador
-            st_javascript("localStorage.setItem('mbeducacion_registro', 'true');")
+            st_javascript(f"localStorage.setItem('mbeducacion_registro_{ID_REUNION}', 'true');")
             
             st.balloons()
             
