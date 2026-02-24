@@ -6,23 +6,18 @@ from sqlalchemy import create_engine
 from sqlalchemy import create_engine, text
 import pandas as pd
 
-# --- CONFIGURACIÓN DE LA REUNIÓN ACTUAL ---
-ID_REUNION = "webinar_marzo_2026"  # <--- CAMBIA ESTO PARA CADA EVENTO NUEVO
-LINK_ZOOM_ACTUAL = "https://us06web.zoom.us/j/89038853644?pwd=nF7qRs4SrzdyxhMB2JgCShyxgkhBIw.1"
-NOMBRE_EVENTO = "Webinar - Debido Proceso 2026"
-
 # --- Al inicio, después de los imports ---
 from streamlit_javascript import st_javascript
 
 # Intentamos leer una marca en el almacenamiento local del navegador (LocalStorage)
 # Esto sobrevive aunque cierren la pestaña o apaguen el PC
-registro_previo = st_javascript(f"localStorage.getItem('mbeducacion_registro_{ID_REUNION}');")
+registro_previo = st_javascript("localStorage.getItem('mbeducacion_registro');")
 
 if registro_previo == "true":
-    st.success("✨ ¡Bienvenido de nuevo! Ya te encuentras registrado al Webinar - Debido Proceso .")
+    st.success("✨ ¡Bienvenido de nuevo! Ya te encuentras registrado en el Curso Sincronico Reforma Raboral para Instituciones Educativas .")
     st.info("Haz clic en el botón de abajo para ingresar directamente a la sala de Zoom.")
     
-    link_zoom = "https://us06web.zoom.us/j/89038853644?pwd=nF7qRs4SrzdyxhMB2JgCShyxgkhBIw.1"
+    link_zoom = "https://us06web.zoom.us/j/83795391348?pwd=blBqaiYliv3OamaJJGv0SPBYMcoNVa.1"
     
     # Usamos un link real estilizado como botón para evitar bloqueos del navegador
     st.markdown(f"""
@@ -60,7 +55,7 @@ engine = create_engine(
 # from tu_archivo_principal import engine 
 
 st.title("Registro de Asistencia y Tratamiento de Datos")
-st.subheader("Bienvenido al Webinar - Debido Proceso, MB Educación")
+st.subheader("Bienvenido al Curso Sincrónico Reforma Raboral para Instituciones Educativas, MB Educación")
 
 with st.form("registro_publico", clear_on_submit=True):
     nombre = st.text_input("Nombre Completo *")
@@ -138,12 +133,12 @@ if boton_registro:
             st.success("¡Registro exitoso! Guardando preferencia...")
             
             # Guardamos la marca en el navegador
-            st_javascript(f"localStorage.setItem('mbeducacion_registro_{ID_REUNION}', 'true');")
+            st_javascript("localStorage.setItem('mbeducacion_registro', 'true');")
             
             st.balloons()
             
             # Link de Zoom
-            link_zoom = "https://us06web.zoom.us/j/89038853644?pwd=nF7qRs4SrzdyxhMB2JgCShyxgkhBIw.1"
+            link_zoom = "https://us06web.zoom.us/j/83795391348?pwd=blBqaiYliv3OamaJJGv0SPBYMcoNVa.1"
             
             # Redirección con un mensaje claro
             st.info("Redirigiendo a Zoom en 2 segundos... Si no carga, haz clic en el botón de arriba.")
@@ -159,7 +154,6 @@ if boton_registro:
         for error in errores:
             st.write(f"- {error}")
         st.warning("Por favor, marca la casilla de aceptación y completa tus datos para poder acceder a la reunión.")
-
 
 
 
