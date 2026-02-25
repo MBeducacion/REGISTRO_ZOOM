@@ -156,7 +156,7 @@ if boton_registro:
             
             # MENSAJE DE ÉXITO CON INFORMACIÓN DE DESTINO
             st.success("✅ ¡Registro exitoso!")
-	    st.balloons()
+	    	st.balloons()
             
             if conteo_actual >= CUPO_MAXIMO:
                 st.info("📺 Serás redirigido a YouTube (la sala de Zoom está llena)")
