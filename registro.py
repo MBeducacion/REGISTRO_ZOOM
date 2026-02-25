@@ -148,7 +148,7 @@ if boton_registro:
                     "mail": email,
                     "hab": 1,
                     "env_info": 1 if acepta_promos else 0,
-                    "cnal": f"Registro Zoom - {ID_REUNION} - {time.strftime('%d/%m/%Y %H:%M')}"
+                    "cnal": f"Registro Zoom - {ID_REUNION} "
                 })
             
             # GUARDAR EN LOCALSTORAGE
