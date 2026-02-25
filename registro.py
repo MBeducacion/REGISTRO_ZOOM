@@ -7,9 +7,9 @@ from sqlalchemy import create_engine, text
 import pandas as pd
 
 # --- CONFIGURACIÓN DE LA REUNIÓN ACTUAL ---
-ID_REUNION = "webinar_marzo_2026"  # <--- CAMBIA ESTO PARA CADA EVENTO NUEVO
+ID_REUNION = "webinar-Debido Proceso"  # <--- CAMBIA ESTO PARA CADA EVENTO NUEVO
 LINK_ZOOM_ACTUAL = "https://us06web.zoom.us/j/89038853644?pwd=nF7qRs4SrzdyxhMB2JgCShyxgkhBIw.1"
-NOMBRE_EVENTO = "Webinar-Debido Proceso"
+NOMBRE_EVENTO = "Webinar - Debido Proceso 2026"
 
 # --- Al inicio, después de los imports ---
 from streamlit_javascript import st_javascript
@@ -60,7 +60,7 @@ engine = create_engine(
 # from tu_archivo_principal import engine 
 
 st.title("Registro de Asistencia y Tratamiento de Datos")
-st.subheader("Bienvenido al Webinar-Debido Proceso, MB Educación")
+st.subheader("Bienvenido al Webinar - Debido Proceso, MB Educación")
 
 with st.form("registro_publico", clear_on_submit=True):
     nombre = st.text_input("Nombre Completo *")
@@ -130,7 +130,7 @@ if boton_registro:
                     "rol": rol_cargo,
                     "hab": 1,
                     "env_info": 1 if acepta_promos else 0,
-                    "cnal": "Registro Zoom, Webinar-Debido Proceso"),
+                    "cnal": "Registro Zoom, webinar-Debido Proceso",
                     
                 })
 
