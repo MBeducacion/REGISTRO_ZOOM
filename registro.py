@@ -3,107 +3,88 @@ from sqlalchemy import text
 import time
 import os
 from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 import pandas as pd
-from streamlit_javascript import st_javascript
 
-# --- CONFIGURACIÓN DEL EVENTO ACTUAL ---
-ID_REUNION = "webinar-Debido Proceso"  # Cambia esto en cada curso
-CUPO_MAXIMO = 100
-LINK_ZOOM = "https://us06web.zoom.us/j/89038853644?pwd=nF7qRs4SrzdyxhMB2JgCShyxgkhBIw.1"
-LINK_YOUTUBE = "https://youtube.com/live/..." # Tu link de respaldo
+# --- CONFIGURACIÓN DE LA REUNIÓN ACTUAL ---
+ID_REUNION = "webinar_marzo_2026"  # <--- CAMBIA ESTO PARA CADA EVENTO NUEVO
+LINK_ZOOM_ACTUAL = "https://us06web.zoom.us/j/89038853644?pwd=nF7qRs4SrzdyxhMB2JgCShyxgkhBIw.1"
 NOMBRE_EVENTO = "Webinar-Debido Proceso"
 
-# --- CONFIGURACIÓN DE BASE DE DATOS (DEBE IR AL INICIO) ---
-try:
-    creds = st.secrets["db_credentials"]
-    engine = create_engine(
-        f"mysql+pymysql://{creds['user']}:{creds['pass']}@{creds['host']}/{creds['name']}",
-        pool_pre_ping=True
-    )
-except Exception as e:
-    st.error(f"Error de conexión a BD: {e}")
-    st.stop()
+# --- Al inicio, después de los imports ---
+from streamlit_javascript import st_javascript
 
-# --- CONSULTAR CUPO ACTUAL (SIEMPRE SE HACE) ---
-try:
-    with engine.connect() as conn:
-        result = conn.execute(text("""
-            SELECT COUNT(*) FROM directorio_tratamiento 
-            WHERE canal_autorizacion LIKE :filtro
-        """), {"filtro": f"%{ID_REUNION}%"})
-        conteo_actual = result.scalar()
-except Exception as e:
-    conteo_actual = 0
-    st.warning(f"No se pudo consultar cupo: {e}")
+# Intentamos leer una marca en el almacenamiento local del navegador (LocalStorage)
+# Esto sobrevive aunque cierren la pestaña o apaguen el PC
+registro_previo = st_javascript(f"localStorage.getItem('mbeducacion_registro_{ID_REUNION}');")
 
-# --- DETERMINAR LINK DE DESTINO SEGÚN CUPO ---
-# ESTO ES CRÍTICO: Se decide ANTES de cualquier verificación de registro
-if conteo_actual >= CUPO_MAXIMO:
-    link_destino = LINK_YOUTUBE
-    mensaje_cupo = "⚠️ ¡Sala de Zoom llena! Serás redirigido a YouTube."
-    tipo_sala = "YouTube (transmisión)"
-else:
-    link_destino = LINK_ZOOM
-    mensaje_cupo = "✨ Tienes cupo en Zoom."
-    tipo_sala = "Zoom (interactivo)"
-
-# --- VERIFICAR REGISTRO PREVIO EN NAVEGADOR ---
-try:
-    registro_previo = st_javascript(f"localStorage.getItem('mbeducacion_registro_{ID_REUNION}');")
-except:
-    registro_previo = None
-
-# --- SI YA SE REGISTRÓ: ACCESO DIRECTO (PERO CON EL LINK CORRECTO SEGÚN CUPO) ---
 if registro_previo == "true":
-    st.title(NOMBRE_EVENTO)
-    st.success("✨ ¡Bienvenido de nuevo! Ya estás registrado.")
+    st.success("✨ ¡Bienvenido de nuevo! Ya te encuentras registrado al Webinar - Debido Proceso .")
+    st.info("Haz clic en el botón de abajo para ingresar directamente a la sala de Zoom.")
     
-    # MOSTRAR INFORMACIÓN SEGÚN EL ESTADO DEL CUPO
-    if conteo_actual >= CUPO_MAXIMO:
-        st.warning("📺 La sala de Zoom está llena. Accederás a la transmisión por YouTube.")
-    else:
-        st.info("🎥 Accederás a la sala interactiva de Zoom.")
+    link_zoom = "https://us06web.zoom.us/j/89038853644?pwd=nF7qRs4SrzdyxhMB2JgCShyxgkhBIw.1"
     
-    # BOTÓN DE ACCESO CON EL LINK CORRECTO (YouTube si cupo lleno, Zoom si hay espacio)
+    # Usamos un link real estilizado como botón para evitar bloqueos del navegador
     st.markdown(f"""
-        <a href="{link_destino}" target="_blank" style="
-            text-decoration: none; background-color: #2D8CFF; color: white;
-            padding: 15px 25px; border-radius: 10px; font-weight: bold;
-            display: inline-block; text-align: center; width: 100%;
-        ">🚀 INGRESAR A LA TRANSMISIÓN ({tipo_sala})</a>
+        <a href="{link_zoom}" target="_blank" style="
+            text-decoration: none;
+            background-color: #2D8CFF;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-weight: bold;
+            display: inline-block;
+            text-align: center;
+            width: 100%;
+        ">🚀 INGRESAR A LA REUNIÓN DE ZOOM</a>
     """, unsafe_allow_html=True)
     
-    # Opción para resetear
     if st.button("No soy yo / Registrar nuevos datos"):
-        st_javascript(f"localStorage.removeItem('mbeducacion_registro_{ID_REUNION}');")
+        st_javascript("localStorage.removeItem('mbeducacion_registro');")
         st.rerun()
     st.stop()
+# 1. Cargar credenciales desde los Secrets de Streamlit
+creds = st.secrets["db_credentials"]
+DB_USER = creds["user"]
+DB_PASS = creds["pass"]
+DB_HOST = creds["host"]
+DB_NAME = creds["name"]
 
-# --- NUEVO REGISTRO (FORMULARIO) ---
+# 2. Crear el motor de conexión
+# Agregamos pool_pre_ping para que la conexión no se caiga durante el evento
+engine = create_engine(
+    f"mysql+pymysql://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}",
+    pool_pre_ping=True
+)
+
+# from tu_archivo_principal import engine 
+
 st.title("Registro de Asistencia y Tratamiento de Datos")
-st.subheader(f"Bienvenido al {NOMBRE_EVENTO}, MB Educación")
-
-# Mostrar advertencia de cupo ANTES del formulario
-if conteo_actual >= CUPO_MAXIMO:
-    st.warning("⚠️ **Importante:** El cupo de Zoom (100 personas) ya está completo. Al registrarte, accederás a la transmisión en vivo por YouTube.")
-else:
-    st.info(f"📊 **Cupos disponibles:** {CUPO_MAXIMO - conteo_actual} de {CUPO_MAXIMO} en Zoom")
+st.subheader("Bienvenido al Webinar-Debido Proceso, MB Educación")
 
 with st.form("registro_publico", clear_on_submit=True):
-    # [Tu formulario existente aquí...]
     nombre = st.text_input("Nombre Completo *")
-    col1, col2 = st.columns([1, 2])
+    # --- NUEVA SECCIÓN: TIPO Y NÚMERO DE DOCUMENTO ---
+    col1, col2 = st.columns([1, 2]) # Dividimos en dos columnas para que se vea mejor
+    
     with col1:
-        tipo_doc = st.selectbox("Tipo de Documento *", ["C.C.", "NIT", "C.E.", "Pasaporte", "T.I.", "Otro"])
+        tipo_doc = st.selectbox(
+            "Tipo de Documento *",
+            ["C.C.", "NIT", "C.E.", "Pasaporte", "T.I.", "Otro"],
+            index=0 # Por defecto selecciona C.C.
+        )
+        
     with col2:
         doc_identidad = st.text_input("Número de Documento *")
-    institucion = st.text_input("Institución Educativa / Empresa / Asociación *")
-    rol_cargo = st.text_input("Cargo en la Institución *")
-    email = st.text_input("Correo Electrónico *")
+
+    institucion = st.text_input("Institución Educativa /Empresa /Asociacion *")
+    rol_cargo = st.text_input(" Cargo en la Institución Educativa /Empresa /Asociacion*")
+    email = st.text_input("Correo Electrónico")
     
     st.markdown("---")
     st.write("🔒 **Autorización de Tratamiento de Datos**")
-    with st.expander("Leer Autorización de Tratamiento de Datos Personales"):
+    # --- MÉTODO 2: VENTANA DESPLEGABLE ---
+    with st.expander("Leer Autotización de Tratamiento de Datos Personales"):
         st.markdown("""
         ### MB EDUCACIÓN - AUTORIZACIÓN PARA EL TRATAMIENTO DE DATOS PERSONALES
         
@@ -114,25 +95,26 @@ with st.form("registro_publico", clear_on_submit=True):
         d) El Oficial de Protección de Datos Personales de la Entidad, ante quien puedo ejercer mis derechos, de forma gratuita, lo contactar en la siguiente dirección electrónica: usodedatos@mbeducacion.com.co 
 
         """)
-    
-    acepta = st.checkbox("He leído y autorizo el tratamiento de mis datos personales *")
-    acepta_promos = st.checkbox("Acepto que MB Educación me envíe información de sus servicios o productos")
-    
-    boton_registro = st.form_submit_button("REGISTRARME E INGRESAR")
 
-# --- PROCESAR REGISTRO ---
+    st.caption("Al marcar la casilla, autoriza a MB Educación a utilizar sus datos según los términos expuestos anteriormente.")
+    acepta = st.checkbox("He leído y autorizo el tratamiento de mis datos personales")
+    acepta_promos = st.checkbox("Acepto que MB Educación me envíe información de sus servicios o productos (Cursos y promociones)")    
+    
+    boton_registro = st.form_submit_button("REGISTRARME E INGRESAR A ZOOM")
+
+# --- LÓGICA DE VALIDACIÓN ---
 if boton_registro:
-    # Validaciones
+    # 1. Verificación estricta de campos obligatorios y casillas
     errores = []
     if not nombre: errores.append("Nombre Completo")
     if not doc_identidad: errores.append("Número de Documento")
     if not institucion: errores.append("Institución")
     if not email: errores.append("Correo Electrónico")
-    if not acepta: errores.append("Aceptación de Tratamiento de Datos")
+    if not acepta: errores.append("Aceptación de Tratamiento de Datos (Casilla obligatoria)")
 
     if not errores:
+        # SI TODO ESTÁ BIEN, PROCEDEMOS AL GUARDADO
         try:
-            # GUARDAR EN BASE DE DATOS
             with engine.begin() as conn:
                 query = text("""
                     INSERT INTO directorio_tratamiento 
@@ -141,34 +123,39 @@ if boton_registro:
                 """)
                 conn.execute(query, {
                     "nom": nombre, 
-                    "tdoc": tipo_doc,
+                    "tdoc": tipo_doc,    # <--- Guardamos el tipo (C.C., C.E., etc.)
                     "doc": doc_identidad,                    
-                    "inst": institucion,
-                    "rol": rol_cargo,
+                    "inst": institucion, 
                     "mail": email,
+                    "rol": rol_cargo,
                     "hab": 1,
                     "env_info": 1 if acepta_promos else 0,
-                    "cnal": f"Registro Zoom - {ID_REUNION} "
+                    "cnal": "Registro Zoom, Webinar-Debido Proceso"),
+                    
                 })
+
+           # SOLO SI EL GUARDADO ES EXITOSO, SE EJECUTA LA REDIRECCIÓN
+            st.success("¡Registro exitoso! Guardando preferencia...")
             
-            # GUARDAR EN LOCALSTORAGE
+            # Guardamos la marca en el navegador
             st_javascript(f"localStorage.setItem('mbeducacion_registro_{ID_REUNION}', 'true');")
             
-            # MENSAJE DE ÉXITO CON INFORMACIÓN DE DESTINO
-            st.success("✅ ¡Registro exitoso!")
-	    	            
-            if conteo_actual >= CUPO_MAXIMO:
-                st.info("📺 Serás redirigido a YouTube (la sala de Zoom está llena)")
-            else:
-                st.info("🎥 Serás redirigido a Zoom")
+            st.balloons()
             
-            # REDIRECCIÓN (SIEMPRE AL LINK DETERMINADO POR CUPO)
-            time.sleep(3)
-            st.markdown(f'<meta http-equiv="refresh" content="0; url={link_destino}">', unsafe_allow_html=True)
+            # Link de Zoom
+            link_zoom = "https://us06web.zoom.us/j/89038853644?pwd=nF7qRs4SrzdyxhMB2JgCShyxgkhBIw.1"
             
+            # Redirección con un mensaje claro
+            st.info("Redirigiendo a Zoom en 2 segundos... Si no carga, haz clic en el botón de arriba.")
+            time.sleep(2)
+            st.markdown(f'<meta http-equiv="refresh" content="0; url={link_zoom}">', unsafe_allow_html=True)
+                        
         except Exception as e:
-            st.error(f"❌ Error al guardar: {e}")
+            st.error(f"Error técnico al guardar: {e}")
     else:
-        st.error("Completa los campos obligatorios:")
+        # SI HAY ERRORES, MOSTRAMOS ADVERTENCIA Y NO REDIRIGIMOS
+        st.error("### ⚠️ No se puede ingresar")
+        st.write("Debes completar los siguientes puntos obligatorios:")
         for error in errores:
             st.write(f"- {error}")
+        st.warning("Por favor, marca la casilla de aceptación y completa tus datos para poder acceder a la reunión.")
