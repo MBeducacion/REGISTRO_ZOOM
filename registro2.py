@@ -5,7 +5,7 @@ import pandas as pd
 from streamlit_javascript import st_javascript
 
 # --- CONFIGURACIÓN DEL EVENTO ACTUAL ---
-ID_REUNION = "Webinar - Debido Proceso-2026"  # Cambia esto en cada curso
+ID_REUNION = "Webinar-Debido Proceso"  # Cambia esto en cada curso
 CUPO_MAXIMO = 100
 LINK_ZOOM = "https://us06web.zoom.us/j/89038853644?pwd=nF7qRs4SrzdyxhMB2JgCShyxgkhBIw.1"  # Usé el link que tenías en el código
 LINK_YOUTUBE = "https://youtube.com/live/..." # Tu link de respaldo
