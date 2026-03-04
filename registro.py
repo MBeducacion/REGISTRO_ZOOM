@@ -5,11 +5,11 @@ import pandas as pd
 from streamlit_javascript import st_javascript
 
 # --- CONFIGURACIÓN DEL EVENTO ACTUAL ---
-ID_REUNION = "Webinar-Debido Proceso"  # Cambia esto en cada curso
+ID_REUNION = "Manejo de la Conducta Suicida"  # Cambia esto en cada curso
 CUPO_MAXIMO = 100
-LINK_ZOOM = "https://us06web.zoom.us/j/89038853644?pwd=nF7qRs4SrzdyxhMB2JgCShyxgkhBIw.1"  # Usé el link que tenías en el código
+LINK_ZOOM = "https://us06web.zoom.us/j/85469570121?pwd=QpPPLibV3InfanosUtaauHsEwhRNss.1"  # Usé el link que tenías en el código
 LINK_YOUTUBE = "https://www.youtube.com/watch?v=1LzG50pd1tk" # Tu link de respaldo
-NOMBRE_EVENTO = "Webinar - Debido Proceso"
+NOMBRE_EVENTO = "Curso Sincronico Manejo de la Conducta Suicida"
 
 # --- CONFIGURACIÓN DE LA BASE DE DATOS (DEBE IR ANTES DE USAR 'engine') ---
 # 1. Cargar credenciales desde los Secrets de Streamlit
@@ -63,7 +63,7 @@ else:
 # --- VISTA PARA USUARIOS YA REGISTRADOS ---
 if registro_previo == "true":
     st.title(NOMBRE_EVENTO)
-    st.success("✨ ¡Bienvenido de nuevo! Ya te encuentras registrado al Webinar.")
+    st.success("✨ ¡Bienvenido de nuevo! Ya te encuentras registrado.")
     st.info("Haz clic en el botón de abajo para ingresar directamente a la transmisión.")
     st.info(mensaje_cupo)
     
