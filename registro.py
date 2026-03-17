@@ -5,11 +5,11 @@ import pandas as pd
 from streamlit_javascript import st_javascript
 
 # --- CONFIGURACIÓN DEL EVENTO ACTUAL ---
-ID_REUNION = "Manejo de la Conducta Suicida"  # Cambia esto en cada curso
+ID_REUNION = "Webinar Educación Inclusiva"  # Cambia esto en cada curso
 CUPO_MAXIMO = 100
-LINK_ZOOM = "https://us06web.zoom.us/j/85469570121?pwd=QpPPLibV3InfanosUtaauHsEwhRNss.1"  # Usé el link que tenías en el código
+LINK_ZOOM = "https://us06web.zoom.us/j/83518427542?pwd=KnqtjSHxdVjSjxq2TuLKlGbiajYeLS.1"  # Usé el link que tenías en el código
 LINK_YOUTUBE = "https://www.youtube.com/watch?v=1LzG50pd1tk" # Tu link de respaldo
-NOMBRE_EVENTO = "Curso Sincronico Manejo de la Conducta Suicida"
+NOMBRE_EVENTO = "Webinar Educación Inclusiva"
 
 # --- CONFIGURACIÓN DE LA BASE DE DATOS (DEBE IR ANTES DE USAR 'engine') ---
 # 1. Cargar credenciales desde los Secrets de Streamlit
